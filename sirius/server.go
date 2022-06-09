@@ -1,8 +1,12 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	b "PosTime/models"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
+	b.MigrateModel()
 	r := gin.Default()
 	r.GET("/", testPath)
 	r.Run(":3000")
