@@ -51,7 +51,7 @@ func UserRegisterPage(c *gin.Context) {
 }
 
 // User register & login
-// @POST /user/register
+// @route POST /user/register
 
 func Register(c *gin.Context) {
 	var registerData UserRegisterData
@@ -93,6 +93,7 @@ func Register(c *gin.Context) {
 				"forward": "/login",
 			})
 		}
+		return
 	}
 }
 
@@ -143,7 +144,6 @@ func MiddleAuth(c *gin.Context) {
 		c.Abort()
 		return
 	}
-
 	c.Next()
 }
 
