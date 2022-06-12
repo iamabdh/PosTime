@@ -16,6 +16,7 @@ func main() {
 	{
 		userRouter.POST("/register", routes.Register)
 		userRouter.POST("/login", routes.Login)
+		userRouter.GET("/page", routes.MiddleAuth, routes.Page)
 	}
 	r.Run(":3000")
 }

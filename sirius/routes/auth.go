@@ -2,13 +2,15 @@ package routes
 
 import (
 	b "PosTime/models"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"regexp"
 )
+
+var store = sessions.NewCookieStore([]byte("test"))
 
 type UserRegisterData struct {
 	Name     string
@@ -84,17 +86,50 @@ func Login(c *gin.Context) {
 	var user b.User
 	// Request: to database for this username
 	b.ConnectDatabase().Find(&user, "username = ?", loginData.Username)
-	fmt.Println(user)
 	// Check password if it's correct
 	if !(bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)) == nil) {
 		c.JSON(401, gin.H{
 			"status":  "Error: Wrong Password",
 			"forward": "/login",
 		})
+		return
 	}
-	loggedUser := UserLoggedData{Name: user.Name, Email: user.Email, Username: user.Username}
-	loggedUserJson, _ := json.Marshal(loggedUser)
-	c.JSON(200,
-		string(loggedUserJson),
-	)
+
+	// Set cookie to user for new login
+	session, _ := store.Get(c.Request, "session")
+	session.Values["user"] = user.Username
+	sessionErr := session.Save(c.Request, c.Writer)
+	// Check error if it exists
+	if sessionErr != nil {
+		log.Fatal(sessionErr)
+		c.JSON(406, gin.H{
+			"status": "bad",
+		})
+		return
+	}
+	//fmt.Println(session.Values)
+	// Send user data
+	//loggedUser := UserLoggedData{Name: user.Name, Email: user.Email, Username: user.Username}
+	//loggedUserJson, _ := json.Marshal(loggedUser)
+	//c.JSON(200,
+	//	string(loggedUserJson),
+	//)
+	// Redirect user to page profile
+	c.Redirect(301, "/user/page")
+}
+
+func MiddleAuth(c *gin.Context) {
+	fmt.Println("running")
+	session, err := store.Get(c.Request, "session")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.Next()
+}
+
+func Page(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"status": "ok",
+	})
 }
