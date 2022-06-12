@@ -1,3 +1,4 @@
 *.env
 acarmar/node_modules/
 sirius/config/
+.idea/
