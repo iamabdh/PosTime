@@ -2,6 +2,7 @@ package routes
 
 import (
 	b "PosTime/models"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
@@ -29,6 +30,28 @@ type UserLoggedData struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 }
+
+// User login and Register
+// @GET /user/login
+
+func UserLoginPage(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"status": "ok",
+		"page":   "Login Page",
+	})
+}
+
+// @GET /user/register
+
+func UserRegisterPage(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"status": "ok",
+		"page":   "Register Page",
+	})
+}
+
+// User register & login
+// @POST /user/register
 
 func Register(c *gin.Context) {
 	var registerData UserRegisterData
@@ -107,29 +130,36 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	//fmt.Println(session.Values)
-	// Send user data
-	//loggedUser := UserLoggedData{Name: user.Name, Email: user.Email, Username: user.Username}
-	//loggedUserJson, _ := json.Marshal(loggedUser)
-	//c.JSON(200,
-	//	string(loggedUserJson),
-	//)
 	// Redirect user to page profile
 	c.Redirect(301, "/user/page")
 }
 
 func MiddleAuth(c *gin.Context) {
 	fmt.Println("running")
-	session, err := store.Get(c.Request, "session")
-
-	if err != nil {
-		log.Fatal(err)
+	session, _ := store.Get(c.Request, "session")
+	_, ok := session.Values["user"]
+	if !ok {
+		c.Redirect(301, "/user/login")
+		c.Abort()
+		return
 	}
+
 	c.Next()
 }
 
 func Page(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"status": "ok",
-	})
+	//cookie, err := c.Request.Cookie("session")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//cookie.Value
+	session, _ := store.Get(c.Request, "session")
+	val := session.Values["user"]
+	var user b.User
+	// Request: to database for this username
+	b.ConnectDatabase().Find(&user, "username = ?", val)
+	// Send profile data
+	loggedUser := UserLoggedData{Name: user.Name, Email: user.Email, Username: user.Username}
+	loggedUserJson, _ := json.Marshal(loggedUser)
+	c.JSON(200, string(loggedUserJson))
 }

@@ -15,7 +15,9 @@ func main() {
 	userRouter := r.Group("/user")
 	{
 		userRouter.POST("/register", routes.Register)
+		userRouter.GET("/register", routes.UserRegisterPage)
 		userRouter.POST("/login", routes.Login)
+		userRouter.GET("/login", routes.UserLoginPage)
 		userRouter.GET("/page", routes.MiddleAuth, routes.Page)
 	}
 	r.Run(":3000")
