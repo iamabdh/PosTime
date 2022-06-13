@@ -1,26 +1,28 @@
 <template>
   <div id="main-container">
     <div id="form-container">
-      <form>
+      <form
+      @submit="sendData()"
+      >
         <div class="form-group">
           <label for="name">Name</label>
-          <input type="text" name="name" />
+          <input type="text" v-model="name" />
         </div>
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="text" name="email" />
+          <input type="text" v-model="email" />
         </div>
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" name="username" />
+          <input type="text" v-model="username" />
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="text" name="password" />
+          <input type="text" v-model="password" />
         </div>
         <div class="form-group">
           <label for="confirmPassword">Confirm Password</label>
-          <input type="text" name="confirmPassword" />
+          <input type="text" v-model="confirmPassword" />
         </div>
         <div id="status-notifiers">
         </div>
@@ -38,8 +40,32 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "register.page.vue",
+  data() {
+    return {
+      name: null,
+      email: null,
+      username: null,
+      password: null,
+      confirmPassword: null,
+    }
+  },
+  methods: {
+    sendData(){
+      // validate before request
+      axios
+          .post("http://127.0.0.1:3000/user/register", {
+            Name: this.name,
+            Email: this.email,
+            Username: this.username,
+            Password: this.password
+          })
+          .then(res => {alert(res)})
+          .catch(err => {alert(err)})
+    }
+  }
 };
 </script>
 <style scoped>

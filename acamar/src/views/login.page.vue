@@ -4,11 +4,11 @@
       <form>
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" name="username" />
+          <input type="text" v-model="username" />
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="text" name="password" />
+          <input type="text" v-model="password" />
         </div>
         <div id="status-notifiers">
         </div>
@@ -26,8 +26,27 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "LoginPage"
+  name: "LoginPage",
+  data() {
+    return {
+      username: null,
+      password: null,
+    }
+  },
+  methods: {
+    sendData() {
+      axios
+          .post("http://127.0.0.1:3000/user/login", {
+            Username: this.username,
+            Password: this.password
+          })
+          .then(res => {alert(res)})
+          .catch(err => {alert(err)})
+    },
+  }
 }
 </script>
 
