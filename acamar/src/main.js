@@ -1,3 +1,6 @@
 import { createApp } from 'vue'
-import Register from "@/Register";
-createApp(Register).mount('#app')
+import App from "@/App";
+import router from "@/router";
+createApp(App)
+    .use(router)
+    .mount('#app')

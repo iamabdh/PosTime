@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: "home.page"
+  name: "footer"
 }
 </script>
 

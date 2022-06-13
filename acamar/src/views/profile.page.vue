@@ -1,5 +1,11 @@
 <template>
+  <div class="main-container">
+    <div>
+      data user profile: <span>
 
+    </span>
+    </div>
+  </div>
 </template>
 
 <script>
