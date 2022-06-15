@@ -9,9 +9,11 @@ export default {
   components: {},
   created() {
   //  GET request to server
-    axios.get("http://127.0.0.1:3000/")
-        .then(res => alert(res))
-        .catch(err => alert(err))
+    axios.get("http://127.0.0.1:3000/", {
+     withCredentials: true,
+    })
+        .then(res => console.log(res.data))
+        .catch(err => console.log(err))
   }
 };
 </script>

@@ -10,7 +10,21 @@ import (
 func main() {
 	b.MigrateModel()
 	r := gin.Default()
-	r.Use(cors.Default())
+
+	// Configuration for Dev mode
+	// used to allow user to send credential requests
+	r.Use(cors.New(
+		cors.Config{
+			AllowOrigins:     []string{"http://127.0.0.1:8080"},
+			AllowMethods:     []string{"PUT", "GET", "POST"},
+			AllowHeaders:     []string{"Access-Control-Allow-Origin"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			AllowOriginFunc: func(origin string) bool {
+				return origin == "https://127.0.0.1:8080"
+			},
+		},
+	))
 	r.GET("/", testPath)
 	userRouter := r.Group("/user")
 	{

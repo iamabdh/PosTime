@@ -4,14 +4,11 @@ import (
 	b "PosTime/models"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
-	"golang.org/x/crypto/bcrypt"
-	"log"
 	"regexp"
-)
 
-var store = sessions.NewCookieStore([]byte("test"))
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+)
 
 type UserRegisterData struct {
 	Name     string
@@ -57,7 +54,7 @@ func Register(c *gin.Context) {
 	var registerData UserRegisterData
 	err := c.BindJSON(&registerData)
 	if err != nil {
-		log.Fatal("Register: Unable to Parse Data")
+		fmt.Println("Register, POST: Unable to Parse Data", err)
 		// Send to user the err with code
 		c.JSON(406, gin.H{
 			"status": "Error: Unable to Parse Data",
@@ -97,11 +94,12 @@ func Register(c *gin.Context) {
 	}
 }
 
+// @route POST /user/login
 func Login(c *gin.Context) {
 	var loginData UserLoginData
 	err := c.BindJSON(&loginData)
 	if err != nil {
-		log.Fatal("Error: Unable to Parse Login Data")
+		fmt.Println("Error: Unable to Parse Login Data")
 		c.JSON(400, gin.H{
 			"status": "Error: Unable to Parse Login Data",
 		})
@@ -114,52 +112,64 @@ func Login(c *gin.Context) {
 	if !(bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)) == nil) {
 		c.JSON(401, gin.H{
 			"status":  "Error: Wrong Password",
-			"forward": "/login",
+			"forward": "/user/login",
 		})
 		return
 	}
 
 	// Set cookie to user for new login
-	session, _ := store.Get(c.Request, "session")
-	session.Values["user"] = user.Username
-	sessionErr := session.Save(c.Request, c.Writer)
-	// Check error if it exists
-	if sessionErr != nil {
-		log.Fatal(sessionErr)
-		c.JSON(406, gin.H{
-			"status": "bad",
-		})
-		return
-	}
-	// Redirect user to page profile
+	// Save user session id on sessions table
+	token := ValidateCookie(user.ID)
+	c.SetCookie("session", token, 100, "/", "http://127.0.0.1:3000", false, true)
 	c.Redirect(301, "/user/page")
 }
 
+// Logout user
+// middleware required
+func Logout(c *gin.Context) {
+
+}
+
+// Auth middleware for checking auth of user
+
 func MiddleAuth(c *gin.Context) {
-	fmt.Println("running")
-	session, _ := store.Get(c.Request, "session")
-	_, ok := session.Values["user"]
-	if !ok {
-		c.Redirect(301, "/user/login")
+
+	//var user b.User
+	// find the cookie from request
+	// require to check issue data of time
+	if _, err := c.Cookie("session"); err != nil {
+		c.JSON(200, gin.H{
+			"status":  "wrong",
+			"forward": "/user/login",
+		})
 		c.Abort()
 		return
 	}
-	c.Next()
 }
 
+// @route GET /user/page
+
 func Page(c *gin.Context) {
-	//cookie, err := c.Request.Cookie("session")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//cookie.Value
-	session, _ := store.Get(c.Request, "session")
-	val := session.Values["user"]
+	session, err := c.Cookie("session")
+	if err != nil {
+		fmt.Println("Page, GET: ", err)
+		c.JSON(200, gin.H{
+			"status":  "something wrong",
+			"forward": "/user/login",
+		})
+		return
+	}
+	// get user id from user session
+	var sessionID b.Session
+	b.ConnectDatabase().Find(&sessionID, "s_id = ?", session)
 	var user b.User
 	// Request: to database for this username
-	b.ConnectDatabase().Find(&user, "username = ?", val)
+	b.ConnectDatabase().Find(&user, "id = ?", sessionID.UID)
 	// Send profile data
-	loggedUser := UserLoggedData{Name: user.Name, Email: user.Email, Username: user.Username}
+	loggedUser := UserLoggedData{
+		Name:     user.Name,
+		Email:    user.Email,
+		Username: user.Username}
 	loggedUserJson, _ := json.Marshal(loggedUser)
 	c.JSON(200, string(loggedUserJson))
 }

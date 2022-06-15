@@ -14,3 +14,8 @@ type User struct {
 	ImageProfile string
 	DateJoined   time.Time
 }
+
+type Session struct {
+	UID string `gorm:"not null"`
+	SID string `gorm:"not null"`
+}

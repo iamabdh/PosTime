@@ -29,13 +29,13 @@
         <input type="submit" value="Sign Up">
       </form>
     </div>
-    <div id="brand-container">
-    <div id="brand-title">
-      <h2>
-        PosTime
-      </h2>
-    </div>
-    </div>
+<!--    <div id="brand-container">-->
+<!--    <div id="brand-title">-->
+<!--      <h2>-->
+<!--        PosTime-->
+<!--      </h2>-->
+<!--    </div>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -62,8 +62,8 @@ export default {
             Username: this.username,
             Password: this.password
           })
-          .then(res => {alert(res)})
-          .catch(err => {alert(err)})
+          .then(res => {console.log(res)})
+          .catch(err => {console.log(err)})
     }
   }
 };

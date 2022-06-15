@@ -1,7 +1,9 @@
 <template>
   <div id="main-container">
     <div id="form-container">
-      <form>
+      <form
+          @submit="sendData()"
+      >
         <div class="form-group">
           <label for="username">Username</label>
           <input type="text" v-model="username" />
@@ -15,13 +17,13 @@
         <input type="submit" value="Login">
       </form>
     </div>
-    <div id="brand-container">
-      <div id="brand-title">
-        <h2>
-          PosTime
-        </h2>
-      </div>
-    </div>
+<!--    <div id="brand-container">-->
+<!--      <div id="brand-title">-->
+<!--        <h2>-->
+<!--          PosTime-->
+<!--        </h2>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -42,9 +44,11 @@ export default {
           .post("http://127.0.0.1:3000/user/login", {
             Username: this.username,
             Password: this.password
+          }, {
+            withCredentials: true
           })
-          .then(res => {alert(res)})
-          .catch(err => {alert(err)})
+          .then(res => {console.log(res)})
+          .catch(err => {console.log(err)})
     },
   }
 }
