@@ -2,7 +2,7 @@
   <div id="main-container">
     <div id="form-container">
       <form
-      @submit="sendData()"
+          v-on:submit.prevent="sendData"
       >
         <div class="form-group">
           <label for="name">Name</label>
@@ -61,8 +61,15 @@ export default {
             Email: this.email,
             Username: this.username,
             Password: this.password
+          }, {
+            headers: {
+              'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'
+            }
           })
-          .then(res => {console.log(res)})
+          .then(res => {
+            // temporary methods
+            this.$router.push("login")
+          })
           .catch(err => {console.log(err)})
     }
   }

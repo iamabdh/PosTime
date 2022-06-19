@@ -2,7 +2,7 @@
   <div id="main-container">
     <div id="form-container">
       <form
-          @submit="sendData()"
+          v-on:submit.prevent="sendData"
       >
         <div class="form-group">
           <label for="username">Username</label>
@@ -45,10 +45,21 @@ export default {
             Username: this.username,
             Password: this.password
           }, {
-            withCredentials: true
+            withCredentials: true,
+            headers: {
+              'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'
+            }
           })
-          .then(res => {console.log(res)})
-          .catch(err => {console.log(err)})
+          .then(res => {
+              if(res.data.allow) {
+                this.$router.push("/")
+              } else {
+                alert("ff")
+              }
+          })
+          .catch(err => {
+            alert(err)
+          })
     },
   }
 }

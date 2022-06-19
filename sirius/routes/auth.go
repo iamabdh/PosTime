@@ -94,7 +94,8 @@ func Register(c *gin.Context) {
 	}
 }
 
-// @route POST /user/login
+// Login @route POST /user/login
+
 func Login(c *gin.Context) {
 	var loginData UserLoginData
 	err := c.BindJSON(&loginData)
@@ -120,8 +121,11 @@ func Login(c *gin.Context) {
 	// Set cookie to user for new login
 	// Save user session id on sessions table
 	token := ValidateCookie(user.ID)
-	c.SetCookie("session", token, 100, "/", "http://127.0.0.1:3000", false, true)
-	c.Redirect(301, "/user/page")
+	c.SetCookie("session", token, 400, "/", "http://127.0.0.1:3000", false, true)
+	c.JSON(200, gin.H{
+		"status": "logged successfully",
+		"allow":  true,
+	})
 }
 
 // Logout user
@@ -133,14 +137,16 @@ func Logout(c *gin.Context) {
 // Auth middleware for checking auth of user
 
 func MiddleAuth(c *gin.Context) {
-
 	//var user b.User
 	// find the cookie from request
 	// require to check issue data of time
+
 	if _, err := c.Cookie("session"); err != nil {
-		c.JSON(200, gin.H{
+		fmt.Println("Middle Auth: ", err)
+		c.JSON(401, gin.H{
 			"status":  "wrong",
-			"forward": "/user/login",
+			"forward": "login",
+			"allow":   false,
 		})
 		c.Abort()
 		return
