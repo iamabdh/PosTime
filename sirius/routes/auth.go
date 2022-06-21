@@ -32,19 +32,13 @@ type UserLoggedData struct {
 // @GET /user/login
 
 func UserLoginPage(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"status": "ok",
-		"page":   "Login Page",
-	})
+
 }
 
 // @GET /user/register
 
 func UserRegisterPage(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"status": "ok",
-		"page":   "Register Page",
-	})
+
 }
 
 // User register & login
@@ -137,11 +131,12 @@ func Logout(c *gin.Context) {
 // Auth middleware for checking auth of user
 
 func MiddleAuth(c *gin.Context) {
-	//var user b.User
 	// find the cookie from request
 	// require to check issue data of time
-
-	if _, err := c.Cookie("session"); err != nil {
+	session, err := c.Cookie("session")
+	var sessionID b.Session
+	b.ConnectDatabase().Find(&sessionID, "s_id = ?", session)
+	if err != nil || sessionID.SID == "" {
 		fmt.Println("Middle Auth: ", err)
 		c.JSON(401, gin.H{
 			"status":  "wrong",
@@ -150,6 +145,48 @@ func MiddleAuth(c *gin.Context) {
 		})
 		c.Abort()
 		return
+	}
+	c.Next()
+}
+
+// check user auth before each request
+// this prevents accessing pages such as register & login
+// @route GET /user/check/:id
+
+func UserCheck(c *gin.Context) {
+	name := c.Params[0].Value
+	session, err := c.Cookie("session")
+	var sessionID b.Session
+	b.ConnectDatabase().Find(&sessionID, "s_id = ?", session)
+	fmt.Println("err: ", err)
+	fmt.Println("session: ", session)
+	fmt.Println("name: ", name)
+	if (err != nil || sessionID.SID == "") && name != "page" {
+		c.JSON(200, gin.H{
+			"forward": name,
+		})
+		return
+	} else if (err != nil || sessionID.SID == "") && name == "page" {
+		c.JSON(200, gin.H{
+			"forward": "login",
+		})
+		return
+	}
+	switch name {
+	case "login":
+		c.JSON(200, gin.H{
+			"forward": "/",
+		})
+		break
+	case "register":
+		c.JSON(200, gin.H{
+			"forward": "/",
+		})
+		break
+	case "page":
+		c.JSON(200, gin.H{
+			"forward": "/",
+		})
 	}
 }
 

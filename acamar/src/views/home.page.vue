@@ -26,15 +26,7 @@ export default {
     }
   },
   created() {
-    axios.get("http://127.0.0.1:3000/user/page", {
-      withCredentials: true,
-    })
-        .then(res => {
-          this.getData()
-        })
-        .catch(err => {
-          this.$router.push(err.response.data.forward)
-        })
+      this.getData()
   },
   methods: {
     getData() {

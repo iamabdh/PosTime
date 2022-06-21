@@ -32,6 +32,7 @@ func main() {
 		userRouter.GET("/register", routes.UserRegisterPage)
 		userRouter.POST("/login", routes.Login)
 		userRouter.GET("/login", routes.UserLoginPage)
+		userRouter.GET("/check/:name", routes.UserCheck)
 		userRouter.GET("/page", routes.MiddleAuth, routes.Page)
 	}
 	r.Run(":3000")
