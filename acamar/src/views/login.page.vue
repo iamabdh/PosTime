@@ -17,13 +17,13 @@
         <input type="submit" value="Login">
       </form>
     </div>
-<!--    <div id="brand-container">-->
-<!--      <div id="brand-title">-->
-<!--        <h2>-->
-<!--          PosTime-->
-<!--        </h2>-->
-<!--      </div>-->
-<!--    </div>-->
+    <div id="brand-container">
+      <div id="brand-title">
+        <h2>
+          PosTime
+        </h2>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -78,6 +78,7 @@ export default {
   /*border: black 1px solid;*/
   text-align: center;
   width: 60%;
+  margin-top: 30px;
 }
 
 #brand-container {
@@ -114,10 +115,23 @@ label {
   /*margin-right:15px;*/
   float: left;
 }
-input {
-  height: 20px;
+input[type="text"] {
+  height: 30px;
   width: 200px;
   border: 1px solid #000;
   margin-top: 10px;
+  border-radius: 20px;
 }
+
+input[type="submit"] {
+ margin-top: 50px;
+  height: 30px;
+  width: 200px;
+  border: none;
+  background: #97ea7a;
+  border-radius: 20px;
+  color: #ffff;
+}
+
+
 </style>
