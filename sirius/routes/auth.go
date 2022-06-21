@@ -10,31 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var ConnectionDB b.DBConnection
-
-func init() {
-	ConnectionDB.ConnectDatabase()
-	ConnectionDB.MigrateModel()
-}
-
-type UserRegisterData struct {
-	Name     string
-	Email    string
-	Username string
-	Password string
-}
-
-type UserLoginData struct {
-	Username string
-	Password string
-}
-
-type UserLoggedData struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Username string `json:"username"`
-}
-
 // User login and Register
 // @GET /user/login
 
