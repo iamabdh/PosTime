@@ -10,7 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func ConnectDatabase() *gorm.DB {
+type DBConnection struct {
+	Db *gorm.DB
+}
+
+func (s *DBConnection) ConnectDatabase() {
 	if godotenv.Load("config/.env") != nil {
 		log.Fatal("Unable to Load Env File")
 	} else {
@@ -25,13 +29,13 @@ func ConnectDatabase() *gorm.DB {
 	dbName := os.Getenv("dbName")
 	password := os.Getenv("password")
 
+	var err error
 	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbName, port)
-	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
+	s.Db, err = gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal("Database Cannot Connected")
 	} else {
 		log.Println("Database Connected Successfully")
 	}
-	return db
 }

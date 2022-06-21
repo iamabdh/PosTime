@@ -1,16 +1,13 @@
 package main
 
 import (
-	b "PosTime/models"
 	"PosTime/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	b.MigrateModel()
 	r := gin.Default()
-
 	// Configuration for Dev mode
 	// used to allow user to send credential requests
 	r.Use(cors.New(

@@ -10,6 +10,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var ConnectionDB b.DBConnection
+
+func init() {
+	ConnectionDB.ConnectDatabase()
+	ConnectionDB.MigrateModel()
+}
+
 type UserRegisterData struct {
 	Name     string
 	Email    string
@@ -32,13 +39,11 @@ type UserLoggedData struct {
 // @GET /user/login
 
 func UserLoginPage(c *gin.Context) {
-
 }
 
 // @GET /user/register
 
 func UserRegisterPage(c *gin.Context) {
-
 }
 
 // User register & login
@@ -73,7 +78,8 @@ func Register(c *gin.Context) {
 			// Encrypt user password
 			hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(registerData.Password), 0)
 			// Store all data to database
-			b.ConnectDatabase().Create(&b.User{
+
+			ConnectionDB.Db.Create(&b.User{
 				Name:     registerData.Name,
 				Email:    registerData.Email,
 				Username: registerData.Username,
@@ -102,7 +108,7 @@ func Login(c *gin.Context) {
 	}
 	var user b.User
 	// Request: to database for this username
-	b.ConnectDatabase().Find(&user, "username = ?", loginData.Username)
+	ConnectionDB.Db.Find(&user, "username = ?", loginData.Username)
 	// Check password if it's correct
 	if !(bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)) == nil) {
 		c.JSON(401, gin.H{
@@ -135,7 +141,7 @@ func MiddleAuth(c *gin.Context) {
 	// require to check issue data of time
 	session, err := c.Cookie("session")
 	var sessionID b.Session
-	b.ConnectDatabase().Find(&sessionID, "s_id = ?", session)
+	ConnectionDB.Db.Find(&sessionID, "s_id = ?", session)
 	if err != nil || sessionID.SID == "" {
 		fmt.Println("Middle Auth: ", err)
 		c.JSON(401, gin.H{
@@ -157,7 +163,7 @@ func UserCheck(c *gin.Context) {
 	name := c.Params[0].Value
 	session, err := c.Cookie("session")
 	var sessionID b.Session
-	b.ConnectDatabase().Find(&sessionID, "s_id = ?", session)
+	ConnectionDB.Db.Find(&sessionID, "s_id = ?", session)
 	fmt.Println("err: ", err)
 	fmt.Println("session: ", session)
 	fmt.Println("name: ", name)
@@ -204,10 +210,10 @@ func Page(c *gin.Context) {
 	}
 	// get user id from user session
 	var sessionID b.Session
-	b.ConnectDatabase().Find(&sessionID, "s_id = ?", session)
+	ConnectionDB.Db.Find(&sessionID, "s_id = ?", session)
 	var user b.User
 	// Request: to database for this username
-	b.ConnectDatabase().Find(&user, "id = ?", sessionID.UID)
+	ConnectionDB.Db.Find(&user, "id = ?", sessionID.UID)
 	// Send profile data
 	loggedUser := UserLoggedData{
 		Name:     user.Name,

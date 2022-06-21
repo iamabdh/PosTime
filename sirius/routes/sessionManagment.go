@@ -32,7 +32,7 @@ func _storeSession(UID string) {
 func ValidateCookie(UID string) string {
 	// Generate key for user
 	token := _token()
-	b.ConnectDatabase().Create(b.Session{UID: UID, SID: token})
+	ConnectionDB.Db.Create(b.Session{UID: UID, SID: token})
 	return token
 }
 
