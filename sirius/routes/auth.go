@@ -11,12 +11,12 @@ import (
 )
 
 // User login and Register
-// @GET /user/login
+// @route GET /user/login
 
 func UserLoginPage(c *gin.Context) {
 }
 
-// @GET /user/register
+// @route GET /user/register
 
 func UserRegisterPage(c *gin.Context) {
 }

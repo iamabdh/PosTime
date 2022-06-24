@@ -16,7 +16,6 @@ func destroyPosTime(c *gin.Context) {
 // @desc GET /user/postime/postimers
 
 func getPosTimers(c *gin.Context) {
-
 }
 
 // future open connection to user whenever there i
