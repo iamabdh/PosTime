@@ -35,3 +35,9 @@ type UserSession struct {
 	SessionID string
 	UserID    string
 }
+
+type MyPosTimer struct {
+	PosTimeID string `json:"PosTimeId"`
+	Text      string `json:"Text"`
+	Time      string `json:"Time"`
+}
