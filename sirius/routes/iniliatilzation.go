@@ -1,8 +1,8 @@
 package routes
 
-import b "PosTime/models"
+import "PosTime/models"
 
-var ConnectionDB b.DBConnection
+var ConnectionDB models.DBConnection
 
 func init() {
 	ConnectionDB.ConnectDatabase()
@@ -25,4 +25,13 @@ type UserLoggedData struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
+}
+
+type UserPosTimeCreate struct {
+	Text string
+}
+
+type UserSession struct {
+	SessionID string
+	UserID    string
 }

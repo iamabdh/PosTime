@@ -1,7 +1,7 @@
 package routes
 
 import (
-	b "PosTime/models"
+	"PosTime/models"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -54,7 +54,7 @@ func Register(c *gin.Context) {
 			hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(registerData.Password), 0)
 			// Store all data to database
 
-			ConnectionDB.Db.Create(&b.User{
+			ConnectionDB.Db.Create(&models.User{
 				Name:     registerData.Name,
 				Email:    registerData.Email,
 				Username: registerData.Username,
@@ -81,7 +81,7 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	var user b.User
+	var user models.User
 	// Request: to database for this username
 	ConnectionDB.Db.Find(&user, "username = ?", loginData.Username)
 	// Check password if it's correct
@@ -115,7 +115,7 @@ func MiddleAuth(c *gin.Context) {
 	// find the cookie from request
 	// require to check issue data of time
 	session, err := c.Cookie("session")
-	var sessionID b.Session
+	var sessionID models.Session
 	ConnectionDB.Db.Find(&sessionID, "s_id = ?", session)
 	if err != nil || sessionID.SID == "" {
 		fmt.Println("Middle Auth: ", err)
@@ -137,7 +137,7 @@ func MiddleAuth(c *gin.Context) {
 func UserCheck(c *gin.Context) {
 	name := c.Params[0].Value
 	session, err := c.Cookie("session")
-	var sessionID b.Session
+	var sessionID models.Session
 	ConnectionDB.Db.Find(&sessionID, "s_id = ?", session)
 	fmt.Println("err: ", err)
 	fmt.Println("session: ", session)
@@ -184,9 +184,9 @@ func Page(c *gin.Context) {
 		return
 	}
 	// get user id from user session
-	var sessionID b.Session
+	var sessionID models.Session
 	ConnectionDB.Db.Find(&sessionID, "s_id = ?", session)
-	var user b.User
+	var user models.User
 	// Request: to database for this username
 	ConnectionDB.Db.Find(&user, "id = ?", sessionID.UID)
 	// Send profile data

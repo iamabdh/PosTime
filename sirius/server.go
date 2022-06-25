@@ -31,6 +31,7 @@ func main() {
 		userRouter.GET("/login", routes.UserLoginPage)
 		userRouter.GET("/check/:name", routes.UserCheck)
 		userRouter.GET("/page", routes.MiddleAuth, routes.Page)
+		userRouter.POST("/postime/create", routes.MiddleAuth, routes.CreatePosTime)
 	}
 	r.Run(":3000")
 }

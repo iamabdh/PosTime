@@ -1,7 +1,7 @@
 package routes
 
 import (
-	b "PosTime/models"
+	"PosTime/models"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -9,8 +9,9 @@ import (
 
 // @desc Generate keys randomly
 // future: update & secure
-func _token() string {
-	b := make([]byte, 10)
+
+func Token(length int) string {
+	b := make([]byte, length)
 	if _, err := rand.Read(b); err != nil {
 		fmt.Println(err)
 		return ""
@@ -31,13 +32,15 @@ func _storeSession(UID string) {
 
 func ValidateCookie(UID string) string {
 	// Generate key for user
-	token := _token()
-	ConnectionDB.Db.Create(b.Session{UID: UID, SID: token})
+	token := Token(10)
+	ConnectionDB.Db.Create(models.Session{UID: UID, SID: token})
 	return token
 }
 
-// @desc Validate each request incoming from user
+// Session ID User : used to get user id from session
 
-//func ValidateRequest(UID string) bool {
-//
-//}
+func SessionIDUser(UID string) string {
+	var userSessionAndID models.Session
+	ConnectionDB.Db.Find(&userSessionAndID, "s_id = ?", UID)
+	return userSessionAndID.UID
+}

@@ -31,7 +31,7 @@ type PosTimersFriend struct {
 }
 
 type PosTime struct {
-	PosTimeID        string    `gorm:"default:uuid_generate_v4()"`
+	PosTimeID        string    `gorm:"not null"`
 	SourcePosTimerID string    `gorm:"not null"`
 	Text             string    `gorm:"not null"`
 	Time             time.Time `gorm:"not null"`
