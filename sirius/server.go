@@ -32,7 +32,11 @@ func main() {
 		userRouter.GET("/check/:name", routes.UserCheck)
 		userRouter.GET("/page", routes.MiddleAuth, routes.Page)
 		userRouter.POST("/postime/create", routes.MiddleAuth, routes.CreatePosTime)
-		userRouter.GET("/postime/mypostime", routes.MiddleAuth, routes.MyPosTimers)
+		userRouter.GET("/postime/my-postime", routes.MiddleAuth, routes.MyPosTimes)
+		userRouter.GET("/postime/public-postimers", routes.MiddleAuth, routes.PublicPostimers)
+		userRouter.POST("/postime/new-postimer", routes.MiddleAuth, routes.UserNewPostimer)
+		userRouter.GET("/postime/postimers", routes.MiddleAuth, routes.UserPostimers)
+
 	}
 	r.Run(":3000")
 }

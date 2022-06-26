@@ -96,7 +96,7 @@ func Login(c *gin.Context) {
 	// Set cookie to user for new login
 	// Save user session id on sessions table
 	token := ValidateCookie(user.ID)
-	c.SetCookie("session", token, 400, "/", "http://127.0.0.1:3000", false, true)
+	c.SetCookie("session", token, 1000, "/", "http://127.0.0.1:3000", false, true)
 	c.JSON(200, gin.H{
 		"status": "logged successfully",
 		"allow":  true,

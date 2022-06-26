@@ -41,3 +41,12 @@ type MyPosTimer struct {
 	Text      string `json:"Text"`
 	Time      string `json:"Time"`
 }
+
+type PublicPostimerProfile struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
+}
+
+type NewPosTimer struct {
+	Username string
+}

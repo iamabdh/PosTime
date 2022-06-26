@@ -20,9 +20,6 @@ type Session struct {
 	SID string `gorm:"not null"`
 }
 
-// SFID acronyms for source friend id
-// TFID target friend id
-
 type PosTimersFriend struct {
 	SourceFriendID string
 	TargetFriendID string

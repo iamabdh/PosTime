@@ -44,3 +44,23 @@ func SessionIDUser(UID string) string {
 	ConnectionDB.Db.Find(&userSessionAndID, "s_id = ?", UID)
 	return userSessionAndID.UID
 }
+
+// Used to check username look-up & return id of user
+
+func IDUserLookUp(username string) (bool, string) {
+	var _userID string
+	ConnectionDB.Db.Table("users").Where("username = ?", username).Select("id").Find(&_userID)
+	return _userID == "", _userID
+}
+
+// FriendshipLookUp Check friendship if not existed added
+// @params:
+
+func FriendshipLookUp(sourceID, targetID string) bool {
+	var _userIDTarget string
+	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").Where("target_friend_id = ?", targetID).Select("target_friend_id").Find(&_userIDTarget)
+	if _userIDTarget == "" {
+		return true
+	}
+	return false
+}
