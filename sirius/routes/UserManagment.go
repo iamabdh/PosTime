@@ -33,20 +33,23 @@ func _storeSession(UID string) {
 func ValidateCookie(UID string) string {
 	// Generate key for user
 	token := Token(10)
-	ConnectionDB.Db.Create(models.Session{UID: UID, SID: token})
+	ConnectionDB.Db.Create(models.Session{
+		UID:  UID,
+		SID:  token,
+		Time: CallTime(),
+		Date: CallDate(),
+	})
 	return token
 }
 
-// Session ID User : used to get user id from session
-
+// SessionIDUser Session ID User : used to get user id from session
 func SessionIDUser(UID string) string {
 	var userSessionAndID models.Session
 	ConnectionDB.Db.Find(&userSessionAndID, "s_id = ?", UID)
 	return userSessionAndID.UID
 }
 
-// Used to check username look-up & return id of user
-
+// IDUserLookUp Used to check username look-up & return id of user
 func IDUserLookUp(username string) (bool, string) {
 	var _userID string
 	ConnectionDB.Db.Table("users").Where("username = ?", username).Select("id").Find(&_userID)
@@ -55,7 +58,6 @@ func IDUserLookUp(username string) (bool, string) {
 
 // FriendshipLookUp Check friendship if not existed added
 // @params:
-
 func FriendshipLookUp(sourceID, targetID string) bool {
 	var _userIDTarget string
 	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").Where("target_friend_id = ?", targetID).Select("target_friend_id").Find(&_userIDTarget)
@@ -63,4 +65,14 @@ func FriendshipLookUp(sourceID, targetID string) bool {
 		return true
 	}
 	return false
+}
+
+func FriendShipIDs(_userId string) []string {
+	var userPostimer []string
+	ConnectionDB.Db.Table("users").Joins(
+		"INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").Where(
+		"source_friend_id = ?", _userId).Select(
+		"target_friend_id").Find(&userPostimer)
+	userPostimer = append(userPostimer, _userId)
+	return userPostimer
 }

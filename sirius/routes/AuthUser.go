@@ -4,10 +4,9 @@ import (
 	"PosTime/models"
 	"encoding/json"
 	"fmt"
-	"regexp"
-
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"regexp"
 )
 
 // User login and Register
@@ -21,9 +20,8 @@ func UserLoginPage(c *gin.Context) {
 func UserRegisterPage(c *gin.Context) {
 }
 
-// User register & login
+// Register User register & login
 // @route POST /user/register
-
 func Register(c *gin.Context) {
 	var registerData UserRegisterData
 	err := c.BindJSON(&registerData)
@@ -45,7 +43,8 @@ func Register(c *gin.Context) {
 		// name & email & username
 		if !(rName.MatchString(registerData.Name) && rEmail.MatchString(registerData.Email) && rUsername.MatchString(registerData.Username)) {
 			c.JSON(406, gin.H{
-				"status": "issue",
+				"status":  "issue",
+				"message": "Cannot parse content",
 			})
 			return
 		} else {
@@ -55,10 +54,11 @@ func Register(c *gin.Context) {
 			// Store all data to database
 
 			ConnectionDB.Db.Create(&models.User{
-				Name:     registerData.Name,
-				Email:    registerData.Email,
-				Username: registerData.Username,
-				Password: string(hashedPassword),
+				Name:       registerData.Name,
+				Email:      registerData.Email,
+				Username:   registerData.Username,
+				Password:   string(hashedPassword),
+				DateJoined: CallDate(),
 			})
 			c.JSON(200, gin.H{
 				"status":  "ok",
@@ -70,7 +70,6 @@ func Register(c *gin.Context) {
 }
 
 // Login @route POST /user/login
-
 func Login(c *gin.Context) {
 	var loginData UserLoginData
 	err := c.BindJSON(&loginData)
@@ -130,10 +129,9 @@ func MiddleAuth(c *gin.Context) {
 	c.Next()
 }
 
-// check user auth before each request
+// UserCheck check user auth before each request
 // this prevents accessing pages such as register & login
 // @route GET /user/check/:id
-
 func UserCheck(c *gin.Context) {
 	name := c.Params[0].Value
 	session, err := c.Cookie("session")
@@ -171,8 +169,7 @@ func UserCheck(c *gin.Context) {
 	}
 }
 
-// @route GET /user/page
-
+// Page @route GET /user/page
 func Page(c *gin.Context) {
 	session, err := c.Cookie("session")
 	if err != nil {

@@ -2,13 +2,13 @@ package routes
 
 import (
 	"PosTime/models"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 )
 
-// @desc POST /user/postime/create
-
+// CreatePosTime @desc POST /user/postime/create
 func CreatePosTime(c *gin.Context) {
 	_userSessionID, err := c.Cookie("session")
 	if err != nil {
@@ -29,6 +29,8 @@ func CreatePosTime(c *gin.Context) {
 		PosTimeID:        Token(8),
 		SourcePosTimerID: _userID,
 		Text:             newPostime.Text,
+		Time:             CallTime(),
+		Date:             CallDate(),
 	})
 	c.JSON(200, gin.H{
 		"status":  "ok",
@@ -36,15 +38,13 @@ func CreatePosTime(c *gin.Context) {
 	})
 }
 
-// @desc DELETE /user/postime/destroy
-
+// DestroyPosTime @desc DELETE /user/postime/destroy
 func DestroyPosTime(c *gin.Context) {
 
 }
 
-// fetch to a user his/her postimes
+// MyPosTimes fetch to a user his/her postimes
 // @route GET /user/postime/my-postime
-
 func MyPosTimes(c *gin.Context) {
 	_userSessionID, err := c.Cookie("session")
 	if err != nil {
@@ -54,14 +54,13 @@ func MyPosTimes(c *gin.Context) {
 		return
 	}
 	_userID := SessionIDUser(_userSessionID)
-	var userPosTimers []MyPosTimer
-	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", _userID).Select("pos_time_id, text, time").Find(&userPosTimers)
+	var userPosTimers []PosTime
+	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", _userID).Select("pos_time_id, text, time, date").Find(&userPosTimers)
 	c.JSON(200, userPosTimers)
 }
 
-// @route	GET /user/postime/public-postimers
+// PublicPostimers @route	GET /user/postime/public-postimers
 // @desc	fetch to public all users
-
 func PublicPostimers(c *gin.Context) {
 	var postimers []PublicPostimerProfile
 	ConnectionDB.Db.Table("users").Select("name, username").Find(&postimers)
@@ -137,7 +136,7 @@ func UserPostimers(c *gin.Context) {
 		userPostimersAll = append(userPostimersAll, userPostimerData)
 	}
 	c.JSON(http.StatusAccepted, userPostimersAll)
-}
+}GET
 
 // UserRemovePostimer remove postimer from user
 // route DELETE /user/postime/remove-postime
@@ -145,10 +144,27 @@ func UserRemovePostimer(c *gin.Context) {
 
 }
 
-// PosTimers fetch to users all postimers in user feed
+// FeedPosTimers  fetch to users all postimers in user feed
 // followed by time
 // future: followed by priority
-// @route GET /user/postime/postimers
-func PosTimers(c *gin.Context) {
-
+// @route GET /user/postime/feed-postimers
+func FeedPosTimers(c *gin.Context) {
+	_userSessionID, err := c.Cookie("session")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "wrong",
+		})
+		return
+	}
+	// Get all user friends ids & userid
+	_usersIDs := FriendShipIDs(SessionIDUser(_userSessionID))
+	fmt.Println(_usersIDs)
+	var userPosTimersAll []PosTime
+	for _, valID := range _usersIDs {
+		var userPosTimers []PosTime
+		ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", valID).Select("pos_time_id, text, time, date").Find(&userPosTimers)
+		fmt.Println(userPosTimers)
+		userPosTimersAll = append(userPosTimersAll, userPosTimers...)
+	}
+	c.JSON(http.StatusAccepted, userPosTimersAll)
 }

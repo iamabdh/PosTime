@@ -1,6 +1,10 @@
 package routes
 
-import "PosTime/models"
+import (
+	"PosTime/models"
+	"fmt"
+	"time"
+)
 
 var ConnectionDB models.DBConnection
 
@@ -36,10 +40,11 @@ type UserSession struct {
 	UserID    string
 }
 
-type MyPosTimer struct {
+type PosTime struct {
 	PosTimeID string `json:"PosTimeId"`
 	Text      string `json:"Text"`
 	Time      string `json:"Time"`
+	Date      string `json:"Date"`
 }
 
 type PublicPostimerProfile struct {
@@ -49,4 +54,17 @@ type PublicPostimerProfile struct {
 
 type NewPosTimer struct {
 	Username string
+}
+
+func CallDate() string {
+	return fmt.Sprintf("%02d-%02d-%d",
+		time.Now().Day(),
+		time.Now().Month(),
+		time.Now().Year())
+}
+
+func CallTime() string {
+	return fmt.Sprintf("%02d:%02d",
+		time.Now().Hour(),
+		time.Now().Minute())
 }
