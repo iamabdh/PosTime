@@ -55,7 +55,7 @@ func MyPosTimes(c *gin.Context) {
 	}
 	_userID := SessionIDUser(_userSessionID)
 	var userPosTimers []PosTime
-	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", _userID).Select("pos_time_id, text, time, date").Find(&userPosTimers)
+	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", _userID).Select("pos_time_id, username, text, time, date").Find(&userPosTimers)
 	c.JSON(200, userPosTimers)
 }
 
@@ -162,7 +162,7 @@ func FeedPosTimers(c *gin.Context) {
 	var userPosTimersAll []PosTime
 	for _, valID := range _usersIDs {
 		var userPosTimers []PosTime
-		ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", valID).Select("pos_time_id, text, time, date").Find(&userPosTimers)
+		ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", valID).Select("pos_time_id, username, text, time, date").Find(&userPosTimers)
 		fmt.Println(userPosTimers)
 		userPosTimersAll = append(userPosTimersAll, userPosTimers...)
 	}

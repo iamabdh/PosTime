@@ -70,6 +70,7 @@ export default {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  font-family: 'Poppins', sans-serif;
 }
 #main-container {
   display: flex;

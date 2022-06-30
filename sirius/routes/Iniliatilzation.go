@@ -42,6 +42,7 @@ type UserSession struct {
 
 type PosTime struct {
 	PosTimeID string `json:"PosTimeId"`
+	Username  string `json:"Username"`
 	Text      string `json:"Text"`
 	Time      string `json:"Time"`
 	Date      string `json:"Date"`

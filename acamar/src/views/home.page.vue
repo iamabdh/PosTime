@@ -1,50 +1,36 @@
 <template>
   <div id="main-container">
-    <div>
+    <div class="main-profile"></div>
+    <div class="main-feed">
+      <PosTimeCreate/>
+      <PostimeViewHandlerComponent/>
     </div>
-    <div>
-      data user: <span>
-      name: {{name}}
-      email: {{email}}
-      username:{{username}}
-    </span>
-    </div>
+    <div class="main-update"></div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import PosTimeCreate from "@/components/postime.create";
+import PosTimeView from "@/components/postime.view";
+import PostimeViewHandlerComponent from "@/components/postime.view.handler.component";
 
 export default {
   name: "Home",
+  components: {PostimeViewHandlerComponent, PosTimeView, PosTimeCreate},
   title: "Home",
   data() {
-    return {
-      name: null,
-      email: null,
-      username:null,
-    }
   },
   created() {
-      this.getData()
   },
   methods: {
-    getData() {
-      axios.get("http://127.0.0.1:3000/user/page", {
-        withCredentials: true,
-      })
-          .then(res => {
-            let data = JSON.parse(res.data)
-            this.name = data.name
-            this.email = data.email
-            this.username = data.username
-          })
-          .catch(err => console.log(err))
-    }
   }
 }
 </script>
 
 <style scoped>
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+ * {
+   font-family: 'Poppins', sans-serif;
+ }
 </style>
