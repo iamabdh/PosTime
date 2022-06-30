@@ -136,7 +136,7 @@ func UserPostimers(c *gin.Context) {
 		userPostimersAll = append(userPostimersAll, userPostimerData)
 	}
 	c.JSON(http.StatusAccepted, userPostimersAll)
-}GET
+}
 
 // UserRemovePostimer remove postimer from user
 // route DELETE /user/postime/remove-postime
