@@ -33,11 +33,9 @@ func _storeSession(UID string) {
 func ValidateCookie(UID string) string {
 	// Generate key for user
 	token := Token(10)
-	ConnectionDB.Db.Create(models.Session{
-		UID:  UID,
-		SID:  token,
-		Time: CallTime(),
-		Date: CallDate(),
+	ConnectionDB.Db.Create(&models.Session{
+		UID: UID,
+		SID: token,
 	})
 	return token
 }

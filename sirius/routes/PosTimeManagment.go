@@ -29,8 +29,6 @@ func CreatePosTime(c *gin.Context) {
 		PosTimeID:        Token(8),
 		SourcePosTimerID: _userID,
 		Text:             newPostime.Text,
-		Time:             CallTime(),
-		Date:             CallDate(),
 	})
 	c.JSON(200, gin.H{
 		"status":  "ok",
@@ -61,6 +59,7 @@ func MyPosTimes(c *gin.Context) {
 
 // PublicPostimers @route	GET /user/postime/public-postimers
 // @desc	fetch to public all users
+// {{API deprecate}}
 func PublicPostimers(c *gin.Context) {
 	var postimers []PublicPostimerProfile
 	ConnectionDB.Db.Table("users").Select("name, username").Find(&postimers)
@@ -162,9 +161,67 @@ func FeedPosTimers(c *gin.Context) {
 	var userPosTimersAll []PosTime
 	for _, valID := range _usersIDs {
 		var userPosTimers []PosTime
-		ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", valID).Select("pos_time_id, username, text, time, date").Find(&userPosTimers)
-		fmt.Println(userPosTimers)
+		ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").
+			Where("id = ?", valID).
+			Select("pos_time_id, username, text, date").
+			Find(&userPosTimers)
+		//fmt.Println(userPosTimers)
 		userPosTimersAll = append(userPosTimersAll, userPosTimers...)
 	}
 	c.JSON(http.StatusAccepted, userPosTimersAll)
+}
+
+// UserDataLowProfile
+// @route GET /user/postime/low-profile
+// @desc data required for main page
+// redundant request may be changed or deleted in future !
+func UserDataLowProfile(c *gin.Context) {
+	_userSessionID, err := c.Cookie("session")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "wrong",
+		})
+		return
+	}
+	_userID := SessionIDUser(_userSessionID)
+	var userLowProfile DataLowProfile
+
+	// assign name and username
+	ConnectionDB.Db.Table("users").
+		Where("id = ?", _userID).
+		Select("name, username").Find(&userLowProfile)
+
+	// assign number of postimes and postimer
+	ConnectionDB.Db.Table("users").
+		Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").
+		Where("id = ? ", _userID).
+		Count(&userLowProfile.Postime)
+
+	ConnectionDB.Db.Table("users").
+		Joins("INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").
+		Where("id = ? ", _userID).
+		Count(&userLowProfile.Postimer)
+	c.JSON(http.StatusAccepted, userLowProfile)
+}
+
+// FindPosTimer
+// @route GET /user/postime/find-postimer
+// @desc send to user collection of postimers (not followed)
+func FindPosTimer(c *gin.Context) {
+	_userSessionID, err := c.Cookie("session")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "wrong",
+		})
+		return
+	}
+	_userID := SessionIDUser(_userSessionID)
+	var usersLowProfile []DataLowProfile
+	// find all user that not followed
+	ConnectionDB.Db.Table("users").
+		Joins("RIGHT JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").
+		Where("id = ? ", _userID).
+		Select("name, username").Find(&usersLowProfile)
+
+	c.JSON(http.StatusAccepted, usersLowProfile)
 }

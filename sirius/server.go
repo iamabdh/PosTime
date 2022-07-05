@@ -37,7 +37,7 @@ func main() {
 		userRouter.POST("/postime/new-postimer", routes.MiddleAuth, routes.UserNewPostimer)
 		userRouter.GET("/postime/postimers", routes.MiddleAuth, routes.UserPostimers)
 		userRouter.GET("/postime/feed-postimers", routes.MiddleAuth, routes.FeedPosTimers)
-
+		userRouter.GET("/postime/low-profile", routes.MiddleAuth, routes.UserDataLowProfile)
 	}
 	r.Run(":3000")
 }

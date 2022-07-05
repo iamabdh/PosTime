@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type User struct {
 	ID           string `gorm:"default:uuid_generate_v4()"`
 	Name         string `gorm:"not null;size:30"`
@@ -10,14 +12,13 @@ type User struct {
 	DateOfBirth  string
 	Bio          string
 	ImageProfile string
-	DateJoined   string `gorm:"not null"`
+	DateJoined   time.Time `gorm:"default: now()"`
 }
 
 type Session struct {
-	UID  string `gorm:"not null"`
-	SID  string `gorm:"not null"`
-	Time string `gorm:"not null"`
-	Date string `gorm:"not null"`
+	UID  string    `gorm:"not null"`
+	SID  string    `gorm:"not null"`
+	Date time.Time `gorm:"default: now()"`
 }
 
 type PosTimersFriend struct {
@@ -28,10 +29,9 @@ type PosTimersFriend struct {
 }
 
 type PosTime struct {
-	PosTimeID        string `gorm:"not null"`
-	SourcePosTimerID string `gorm:"not null"`
-	Text             string `gorm:"not null"`
-	Time             string `gorm:"not null"`
-	Date             string `gorm:"not null"`
-	User             User   `gorm:"foreignKey:SourcePosTimerID;references:ID"`
+	PosTimeID        string    `gorm:"not null"`
+	SourcePosTimerID string    `gorm:"not null"`
+	Text             string    `gorm:"not null"`
+	Date             time.Time `gorm:"default: now()"`
+	User             User      `gorm:"foreignKey:SourcePosTimerID;references:ID"`
 }

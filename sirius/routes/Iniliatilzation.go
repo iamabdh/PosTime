@@ -2,7 +2,6 @@ package routes
 
 import (
 	"PosTime/models"
-	"fmt"
 	"time"
 )
 
@@ -41,11 +40,10 @@ type UserSession struct {
 }
 
 type PosTime struct {
-	PosTimeID string `json:"PosTimeId"`
-	Username  string `json:"Username"`
-	Text      string `json:"Text"`
-	Time      string `json:"Time"`
-	Date      string `json:"Date"`
+	PosTimeID string    `json:"PosTimeId"`
+	Username  string    `json:"Username"`
+	Text      string    `json:"Text"`
+	Date      time.Time `json:"Date"`
 }
 
 type PublicPostimerProfile struct {
@@ -57,15 +55,10 @@ type NewPosTimer struct {
 	Username string
 }
 
-func CallDate() string {
-	return fmt.Sprintf("%02d-%02d-%d",
-		time.Now().Day(),
-		time.Now().Month(),
-		time.Now().Year())
-}
-
-func CallTime() string {
-	return fmt.Sprintf("%02d:%02d",
-		time.Now().Hour(),
-		time.Now().Minute())
+type DataLowProfile struct {
+	Name       string `json:"name"`
+	Username   string `json:"username"`
+	Postime    int64  `json:"postime"`
+	Postimer   int64  `json:"postimer"`
+	LastUpdate string `json:"lastUpdate"`
 }
