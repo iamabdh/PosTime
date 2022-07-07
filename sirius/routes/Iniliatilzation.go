@@ -62,3 +62,8 @@ type DataLowProfile struct {
 	Postimer   int64  `json:"postimer"`
 	LastUpdate string `json:"lastUpdate"`
 }
+
+type PosTimeLastUpdate struct {
+	Username string `json:"username"`
+	Date     string `json:"date"`
+}

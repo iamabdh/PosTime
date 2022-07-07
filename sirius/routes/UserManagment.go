@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"time"
 )
 
 // @desc Generate keys randomly
@@ -65,12 +66,29 @@ func FriendshipLookUp(sourceID, targetID string) bool {
 	return false
 }
 
-func FriendShipIDs(_userId string) []string {
+// FriendShipIDs
+// @desc used for return list of friend id
+// @params: addUser check if needed to add user id to list
+// addUser ==> true for feed
+func FriendShipIDs(addUser bool, _userId string) []string {
 	var userPostimer []string
 	ConnectionDB.Db.Table("users").Joins(
 		"INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").Where(
 		"source_friend_id = ?", _userId).Select(
 		"target_friend_id").Find(&userPostimer)
-	userPostimer = append(userPostimer, _userId)
+	if addUser {
+		userPostimer = append(userPostimer, _userId)
+	}
 	return userPostimer
+}
+
+// GetPosTimeCreatedAt
+// @desc Used for retrieve data the postime create
+func GetPosTimeCreatedAt(postimeID string) time.Time {
+	var _createAt time.Time
+	ConnectionDB.Db.Table("pos_times").
+		Where("pos_time_id = ?", postimeID).
+		Select("date").
+		Find(&_createAt)
+	return _createAt
 }

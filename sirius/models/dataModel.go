@@ -29,9 +29,17 @@ type PosTimersFriend struct {
 }
 
 type PosTime struct {
-	PosTimeID        string    `gorm:"not null"`
+	PosTimeID        string    `gorm:"index:,unique,composite:id;not null"`
 	SourcePosTimerID string    `gorm:"not null"`
 	Text             string    `gorm:"not null"`
 	Date             time.Time `gorm:"default: now()"`
 	User             User      `gorm:"foreignKey:SourcePosTimerID;references:ID"`
+}
+
+type LastUpdate struct {
+	SourcePosTimerID string
+	PosTimeIDCreated string
+	SourceUserID     User      `gorm:"foreignKey:SourcePosTimerID;references:ID"`
+	SourcePosTimeID  PosTime   `gorm:"foreignKey:PosTimeIDCreated;references:PosTimeID"`
+	Date             time.Time `gorm:"default: now()"`
 }

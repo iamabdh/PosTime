@@ -25,11 +25,37 @@ func CreatePosTime(c *gin.Context) {
 		return
 	}
 	_userID := SessionIDUser(_userSessionID)
+	_postimeToken := Token(8)
+
 	ConnectionDB.Db.Create(&models.PosTime{
-		PosTimeID:        Token(8),
+		PosTimeID:        _postimeToken,
 		SourcePosTimerID: _userID,
 		Text:             newPostime.Text,
 	})
+
+	// update last_update tables for this creation
+	var _userIDLastUpdate string
+	ConnectionDB.Db.Table("last_updates").
+		Where("source_pos_timer_id = ?", _userID).
+		Select("source_pos_timer_id").
+		Find(&_userIDLastUpdate)
+
+	if _userIDLastUpdate == "" {
+		fmt.Println("first condition")
+		ConnectionDB.Db.Create(&models.LastUpdate{
+			PosTimeIDCreated: _postimeToken,
+			SourcePosTimerID: _userID,
+		})
+	} else if _userIDLastUpdate == _userID {
+		fmt.Println("second condition")
+		ConnectionDB.Db.Table("last_updates").
+			Where("source_pos_timer_id = ?", _userID).
+			Updates(models.LastUpdate{
+				PosTimeIDCreated: _postimeToken,
+				Date:             GetPosTimeCreatedAt(_postimeToken),
+			})
+	}
+
 	c.JSON(200, gin.H{
 		"status":  "ok",
 		"message": "PosTime Created Successfully",
@@ -156,7 +182,7 @@ func FeedPosTimers(c *gin.Context) {
 		return
 	}
 	// Get all user friends ids & userid
-	_usersIDs := FriendShipIDs(SessionIDUser(_userSessionID))
+	_usersIDs := FriendShipIDs(true, SessionIDUser(_userSessionID))
 	fmt.Println(_usersIDs)
 	var userPosTimersAll []PosTime
 	for _, valID := range _usersIDs {
@@ -202,6 +228,27 @@ func UserDataLowProfile(c *gin.Context) {
 		Where("id = ? ", _userID).
 		Count(&userLowProfile.Postimer)
 	c.JSON(http.StatusAccepted, userLowProfile)
+}
+
+// UserPosTimerLastUpdate
+// @route GET /user/postime/last-update
+// @desc Fetch to user last update from postimer
+func UserPosTimerLastUpdate(c *gin.Context) {
+	_userSessionID, err := c.Cookie("session")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "wrong",
+		})
+		return
+	}
+	var usersLastUpdate []PosTimeLastUpdate
+	ConnectionDB.Db.Table("pos_timers_friends").
+		Joins("inner join users on users.id = pos_timers_friends.target_friend_id").
+		Joins("inner join last_updates on last_updates.source_pos_timer_id = users.id").
+		Select("username, date").
+		Where("pos_timers_friends.source_friend_id = ?", SessionIDUser(_userSessionID)).
+		Find(&usersLastUpdate)
+	c.JSON(http.StatusAccepted, usersLastUpdate)
 }
 
 // FindPosTimer

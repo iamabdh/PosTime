@@ -5,18 +5,18 @@
     </div>
     <div class="username-user-details-low-profile">
       <div class="username">
-        @loui
+        <span v-if="username">@{{username}}</span>
       </div>
       <div class="name">
-        Loui Aki
+        {{nameProfile}}
       </div>
     </div>
     <div class="postimes-postimers-details-low-profile">
       <div class="postimes">
-        PosTime <span style="margin: 0 20px">30</span>
+        PosTime <span style="margin: 0 20px">{{postime}}</span>
       </div>
       <div class="postimers">
-        PosTimer <span style="margin: 0 20px">13</span>
+        PosTimer <span style="margin: 0 20px">{{postimer}}</span>
       </div>
     </div>
     <div class="main-linkers-low-profile">
@@ -37,14 +37,36 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "LowProfileHome",
+  created() {
+    this.getLowProfile()
+  },
   data(){
     return{
+      username: null,
+      nameProfile: null,
+      postime: null,
+      postimer: null,
       homeFeedComponent: "PostimeViewHandlerComponent"
     }
   },
   methods: {
+    getLowProfile() {
+      axios.get("http://127.0.0.1:3000/user/postime/low-profile", {
+        withCredentials: true
+      })
+          .then(res => {
+            let lowProfileData = res.data
+            this.username = lowProfileData.username
+            this.nameProfile = lowProfileData.name
+            this.postime = lowProfileData.postime
+            this.postimer = lowProfileData.postimer
+           })
+          .catch(err => console.log(err))
+    },
     changeComponentsHome() {
       this.homeFeedComponent = "PostimeViewHandlerComponent"
       this.$emit("Change-Component-Feed", this.homeFeedComponent)

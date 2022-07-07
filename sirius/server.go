@@ -38,6 +38,7 @@ func main() {
 		userRouter.GET("/postime/postimers", routes.MiddleAuth, routes.UserPostimers)
 		userRouter.GET("/postime/feed-postimers", routes.MiddleAuth, routes.FeedPosTimers)
 		userRouter.GET("/postime/low-profile", routes.MiddleAuth, routes.UserDataLowProfile)
+		userRouter.GET("/postime/last-update", routes.MiddleAuth, routes.UserPosTimerLastUpdate)
 	}
 	r.Run(":3000")
 }
