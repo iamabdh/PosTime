@@ -7,72 +7,18 @@
     </div>
     <div class="users-postimer-update-main">
       <div class="container-main-user-detail-postimer">
-        <div class="user-postimer">
-          <div class="user-image-postimer">
-            <img src="https://avatars.githubusercontent.com/u/20264401">
-          </div>
-          <div class="user-details-postimer">
-            <div class="time-latest-postimer">
-              2 m
+        <div v-for="data in lastUpdateData">
+          <div class="user-postimer">
+            <div class="user-image-postimer">
+              <img src="https://avatars.githubusercontent.com/u/20264401">
             </div>
-            <div class="username-postimer">
-              @jack
-            </div>
-          </div>
-        </div>
-      </div> <div class="container-main-user-detail-postimer">
-        <div class="user-postimer">
-          <div class="user-image-postimer">
-            <img src="https://avatars.githubusercontent.com/u/20264401">
-          </div>
-          <div class="user-details-postimer">
-            <div class="time-latest-postimer">
-              2 m
-            </div>
-            <div class="username-postimer">
-              @jack
-            </div>
-          </div>
-        </div>
-      </div> <div class="container-main-user-detail-postimer">
-        <div class="user-postimer">
-          <div class="user-image-postimer">
-            <img src="https://avatars.githubusercontent.com/u/20264401">
-          </div>
-          <div class="user-details-postimer">
-            <div class="time-latest-postimer">
-              2 m
-            </div>
-            <div class="username-postimer">
-              @jack
-            </div>
-          </div>
-        </div>
-      </div> <div class="container-main-user-detail-postimer">
-        <div class="user-postimer">
-          <div class="user-image-postimer">
-            <img src="https://avatars.githubusercontent.com/u/20264401">
-          </div>
-          <div class="user-details-postimer">
-            <div class="time-latest-postimer">
-              2 m
-            </div>
-            <div class="username-postimer">
-              @jack
-            </div>
-          </div>
-        </div>
-      </div> <div class="container-main-user-detail-postimer">
-        <div class="user-postimer">
-          <div class="user-image-postimer">
-            <img src="https://avatars.githubusercontent.com/u/20264401">
-          </div>
-          <div class="user-details-postimer">
-            <div class="time-latest-postimer">
-              2 m
-            </div>
-            <div class="username-postimer">
-              @jack
+            <div class="user-details-postimer">
+              <div class="time-latest-postimer">
+                {{data.date}}
+              </div>
+              <div class="username-postimer">
+                {{data.username}}
+              </div>
             </div>
           </div>
         </div>
@@ -82,8 +28,29 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "PostimersUpdateHome"
+  name: "PostimersUpdateHome",
+  data(){
+    return {
+      lastUpdateData: null,
+    }
+  },
+  created() {
+     this.getLastUpdate()
+  },
+  methods: {
+    getLastUpdate() {
+      axios.get("http://127.0.0.1:3000/user/postime/last-update", {
+        withCredentials: true
+      })
+          .then(res => {
+            this.lastUpdateData = res.data
+          })
+          .catch(err => console.log(err))
+    }
+  }
 }
 </script>
 
