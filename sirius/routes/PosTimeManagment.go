@@ -247,6 +247,7 @@ func UserPosTimerLastUpdate(c *gin.Context) {
 		Joins("inner join last_updates on last_updates.source_pos_timer_id = users.id").
 		Select("username, date").
 		Where("pos_timers_friends.source_friend_id = ?", SessionIDUser(_userSessionID)).
+		Order("date desc").
 		Find(&usersLastUpdate)
 	c.JSON(http.StatusAccepted, usersLastUpdate)
 }
