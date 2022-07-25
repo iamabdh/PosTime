@@ -50,6 +50,8 @@ export default {
  * {
    font-family: 'Poppins', sans-serif;
  }
+body {
+}
 #main-container {
   display: flex;
 }
@@ -58,16 +60,26 @@ export default {
   margin-right: auto;
   left: 0;
   width: 20%;
+  height: 100%;
+  position: sticky;
+  align-self: flex-start;
+  top: 20px;
 }
 
 .main-feed {
   /*border: 1px solid;*/
   width: 50%;
+  /*position: relative;*/
+  overflow-y: auto;
 }
 .main-update {
   /*border: 1px solid;*/
   margin-left: auto;
   right: 0;
   width: 20%;
+  top: 20px;
+  position: sticky;
+  height: 100%;
+
 }
 </style>

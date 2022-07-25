@@ -59,7 +59,11 @@ func IDUserLookUp(username string) (bool, string) {
 // @params:
 func FriendshipLookUp(sourceID, targetID string) bool {
 	var _userIDTarget string
-	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").Where("target_friend_id = ?", targetID).Select("target_friend_id").Find(&_userIDTarget)
+	ConnectionDB.Db.Table("users").
+		Joins("INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").
+		Where("target_friend_id = ?", sourceID).
+		Where("target_friend_id = ?", targetID).
+		Select("target_friend_id").Find(&_userIDTarget)
 	if _userIDTarget == "" {
 		return true
 	}

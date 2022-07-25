@@ -105,7 +105,7 @@ func Login(c *gin.Context) {
 
 	// send to user has been authenticated
 	c.JSON(200, gin.H{
-		"status": "logged successfully",
+		"status": "logged in successfully",
 		"allow":  true,
 	})
 }
@@ -113,7 +113,18 @@ func Login(c *gin.Context) {
 // Logout user
 // middleware required
 func Logout(c *gin.Context) {
-
+	c.SetCookie(
+		"session",
+		"",
+		0,
+		"/",
+		"http://127.0.0.1:3000",
+		false,
+		true)
+	c.JSON(200, gin.H{
+		"status":  "logged out successfully",
+		"forward": "login",
+	})
 }
 
 // Auth middleware for checking auth of user

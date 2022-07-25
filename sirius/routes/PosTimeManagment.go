@@ -67,9 +67,9 @@ func DestroyPosTime(c *gin.Context) {
 
 }
 
-// MyPosTimes fetch to a user his/her postimes
+// MyPosTime fetch to a user his/her postimes
 // @route GET /user/postime/my-postime
-func MyPosTimes(c *gin.Context) {
+func MyPosTime(c *gin.Context) {
 	_userSessionID, err := c.Cookie("session")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -78,14 +78,38 @@ func MyPosTimes(c *gin.Context) {
 		return
 	}
 	_userID := SessionIDUser(_userSessionID)
-	var userPosTimers []PosTime
-	ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").Where("id = ?", _userID).Select("pos_time_id, username, text, time, date").Find(&userPosTimers)
-	c.JSON(200, userPosTimers)
+	var userPosTime []PosTime
+	ConnectionDB.Db.Table("users").
+		Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").
+		Where("id = ?", _userID).
+		Select("pos_time_id, username, text, time, date").Find(&userPosTime)
+	c.JSON(200, userPosTime)
+}
+
+// MyPosTimer fetch to a user postimer aka friends
+// @route GET /user/postime/my-postimer
+func MyPosTimer(c *gin.Context) {
+	_userSessionID, err := c.Cookie("session")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "wrong",
+		})
+		return
+	}
+	_userID := SessionIDUser(_userSessionID)
+	var userPosTimer []UserPosTimer
+	ConnectionDB.Db.Table("users u1").
+		Joins("INNER JOIN pos_timers_friends ptf on u1.id=ptf.source_friend_id").
+		Joins("INNER JOIN users u2 on ptf.target_friend_id=u2.id").
+		Where("u1.id = ?", _userID).
+		Select("u2.name, u2.username").
+		Find(&userPosTimer)
+	c.JSON(200, userPosTimer)
 }
 
 // PublicPostimers @route	GET /user/postime/public-postimers
 // @desc	fetch to public all users
-// {{API deprecate}}
+// API DEV
 func PublicPostimers(c *gin.Context) {
 	var postimers []PublicPostimerProfile
 	ConnectionDB.Db.Table("users").Select("name, username").Find(&postimers)
@@ -118,6 +142,7 @@ func UserNewPostimer(c *gin.Context) {
 		c.JSON(http.StatusExpectationFailed, gin.H{
 			"status":   "wrong",
 			"username": "not exist or duplication occur",
+			"check":    false,
 		})
 		return
 	}
@@ -131,6 +156,7 @@ func UserNewPostimer(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status":  "good",
 		"message": "Friendship added successfully",
+		"check":   true,
 	})
 }
 
@@ -182,19 +208,21 @@ func FeedPosTimers(c *gin.Context) {
 		return
 	}
 	// Get all user friends ids & userid
-	_usersIDs := FriendShipIDs(true, SessionIDUser(_userSessionID))
-	fmt.Println(_usersIDs)
-	var userPosTimersAll []PosTime
-	for _, valID := range _usersIDs {
-		var userPosTimers []PosTime
-		ConnectionDB.Db.Table("users").Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").
-			Where("id = ?", valID).
-			Select("pos_time_id, username, text, date").
-			Find(&userPosTimers)
-		//fmt.Println(userPosTimers)
-		userPosTimersAll = append(userPosTimersAll, userPosTimers...)
-	}
-	c.JSON(http.StatusAccepted, userPosTimersAll)
+	_usersID := SessionIDUser(_userSessionID)
+	var feedUser []PosTime
+	raw := fmt.Sprintf("select pt.pos_time_id, u2.username, pt.text, pt.date\n"+
+		"from pos_timers_friends p1\n"+
+		"inner join users u1 on u1.id = p1.source_friend_id\n"+
+		"inner join users u2 on u2.id = p1.target_friend_id\n"+
+		"inner join pos_times pt on u2.id = pt.source_pos_timer_id\n"+
+		"where u1.id = '%[1]v'\n"+
+		"union all\n"+
+		"select pt.pos_time_id, u3.username, pt.text, pt.date\n"+
+		"from users u3 inner join pos_times pt on u3.id = pt.source_pos_timer_id\n"+
+		"where u3.id = '%[1]v'\n"+
+		"order by date desc", _usersID)
+	ConnectionDB.Db.Raw(raw).Find(&feedUser)
+	c.JSON(http.StatusAccepted, feedUser)
 }
 
 // UserDataLowProfile
@@ -245,7 +273,7 @@ func UserPosTimerLastUpdate(c *gin.Context) {
 	ConnectionDB.Db.Table("pos_timers_friends").
 		Joins("inner join users on users.id = pos_timers_friends.target_friend_id").
 		Joins("inner join last_updates on last_updates.source_pos_timer_id = users.id").
-		Select("username, date").
+		Select("pos_time_id_created, username, date").
 		Where("pos_timers_friends.source_friend_id = ?", SessionIDUser(_userSessionID)).
 		Order("date desc").
 		Find(&usersLastUpdate)
@@ -266,10 +294,27 @@ func FindPosTimer(c *gin.Context) {
 	_userID := SessionIDUser(_userSessionID)
 	var usersLowProfile []DataLowProfile
 	// find all user that not followed
-	ConnectionDB.Db.Table("users").
-		Joins("RIGHT JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").
-		Where("id = ? ", _userID).
-		Select("name, username").Find(&usersLowProfile)
-
+	raw := fmt.Sprintf(
+		"select u1.name, u1.username, lu.date\n"+
+			"from users u1\n"+
+			"left join last_updates lu on u1.id = lu.source_pos_timer_id\n"+
+			"where not u1.id in (\n"+
+			"    select f.target_friend_id\n"+
+			"    from pos_timers_friends f\n"+
+			"    where u1.id = f.target_friend_id and f.source_friend_id = '%[1]v'\n"+
+			")\n"+
+			"and u1.id != '%[1]v'\n", _userID)
+	ConnectionDB.Db.Raw(raw).Find(&usersLowProfile)
+	for index, valIDUsers := range usersLowProfile {
+		// count postimes and postimers
+		ConnectionDB.Db.Table("users").
+			Joins("INNER JOIN pos_times on users.id=pos_times.source_pos_timer_id").
+			Where("username = ? ", valIDUsers.Username).
+			Count(&usersLowProfile[index].Postime)
+		ConnectionDB.Db.Table("users").
+			Joins("INNER JOIN pos_timers_friends on users.id=pos_timers_friends.source_friend_id").
+			Where("username = ? ", valIDUsers.Username).
+			Count(&usersLowProfile[index].Postimer)
+	}
 	c.JSON(http.StatusAccepted, usersLowProfile)
 }

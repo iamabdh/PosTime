@@ -31,7 +31,7 @@
       </div>
     </div>
     <div class="logout-low-profile">
-      <button class="low-profile-btn">Logout</button>
+      <button class="low-profile-btn" @click="userLogout">Logout</button>
     </div>
   </div>
 </template>
@@ -74,8 +74,16 @@ export default {
     changeComponentsFindPosTimer() {
       this.homeFeedComponent = "FindPosTimerHome"
       this.$emit("Change-Component-Feed", this.homeFeedComponent)
+    },
+    userLogout () {
+      axios.get("http://127.0.0.1:3000/user/logout", {
+        withCredentials: true
+      }).then(res => {
+        this.$router.push(res.data.forward)
+      }).catch(err => console.log(err))
     }
   }
+
 }
 </script>
 

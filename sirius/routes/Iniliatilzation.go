@@ -40,12 +40,16 @@ type UserSession struct {
 }
 
 type PosTime struct {
-	PosTimeID string    `json:"PosTimeId"`
+	PosTimeID string    `json:"PosTimeID"`
 	Username  string    `json:"Username"`
 	Text      string    `json:"Text"`
 	Date      time.Time `json:"Date"`
 }
 
+type UserPosTimer struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
+}
 type PublicPostimerProfile struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
@@ -56,14 +60,15 @@ type NewPosTimer struct {
 }
 
 type DataLowProfile struct {
-	Name       string `json:"name"`
-	Username   string `json:"username"`
-	Postime    int64  `json:"postime"`
-	Postimer   int64  `json:"postimer"`
-	LastUpdate string `json:"lastUpdate"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Postime  int64  `json:"postime"`
+	Postimer int64  `json:"postimer"`
+	Date     string `json:"lastUpdate"`
 }
 
 type PosTimeLastUpdate struct {
-	Username string `json:"username"`
-	Date     string `json:"date"`
+	PosTimeIDCreated string `json:"PosTimeID"`
+	Username         string `json:"username"`
+	Date             string `json:"date"`
 }

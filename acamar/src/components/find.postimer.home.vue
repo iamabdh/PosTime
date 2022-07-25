@@ -1,88 +1,68 @@
 <template>
   <div class="main-find-postimer">
     <div class="container-card-find-postimer">
-      <div class="card-find-postimer">
-        <div class="image-container-find-postimer">
-          <img src="https://avatars.githubusercontent.com/u/20264401">
-        </div>
-        <div class="user-details-find-postimer verical-alingment-postimes-postimer-common">
-          <div class="name-find-postimer">
-            Abdullah Salim
+      <div v-for="objPosTimer in objNewPosTimer">
+        <div class="card-find-postimer">
+          <div class="image-container-find-postimer">
+            <img src="https://avatars.githubusercontent.com/u/20264401" />
           </div>
-          <div class="username-find-postimer">
-            @abdullah
+          <div
+            class="
+              user-details-find-postimer
+              verical-alingment-postimes-postimer-common
+            "
+          >
+            <div class="name-find-postimer">
+              {{ objPosTimer.name }}
+            </div>
+            <div class="username-find-postimer">
+              @{{ objPosTimer.username }}
+            </div>
           </div>
-        </div>
-        <div class="postime-postimers-find-postimer verical-alingment-postimes-postimer-common">
-          <div class="postime-find-postimer">
-            PosTime <span class="postime-postimers-values">20</span>
+          <div
+            class="
+              postime-postimers-find-postimer
+              verical-alingment-postimes-postimer-common
+            "
+          >
+            <div class="postime-find-postimer">
+              PosTime
+              <span class="postime-postimers-values">{{
+                objPosTimer.postime
+              }}</span>
+            </div>
+            <div class="postimer-find-postimer">
+              PosTimer
+              <span class="postime-postimers-values">{{
+                objPosTimer.postimer
+              }}</span>
+            </div>
           </div>
-          <div class="postimer-find-postimer">
-            PosTimer <span class="postime-postimers-values">20</span>
-          </div>
-        </div>
-        <div class="last-update-follow-find-postimer verical-alingment-postimes-postimer-common" style="margin-top: 15px">
-          <div class="last-update">
-            Last Update <span class="last-update-value">12h</span>
-          </div>
-          <div class="follow-find-postimer">
-            <button class="follow-btn">Follow</button>
-          </div>
-        </div>
-      </div><div class="card-find-postimer">
-        <div class="image-container-find-postimer">
-          <img src="https://avatars.githubusercontent.com/u/20264401">
-        </div>
-        <div class="user-details-find-postimer verical-alingment-postimes-postimer-common">
-          <div class="name-find-postimer">
-            Abdullah Salim
-          </div>
-          <div class="username-find-postimer">
-            @abdullah
-          </div>
-        </div>
-        <div class="postime-postimers-find-postimer verical-alingment-postimes-postimer-common">
-          <div class="postime-find-postimer">
-            PosTime <span class="postime-postimers-values">20</span>
-          </div>
-          <div class="postimer-find-postimer">
-            PosTimer <span class="postime-postimers-values">20</span>
-          </div>
-        </div>
-        <div class="last-update-follow-find-postimer verical-alingment-postimes-postimer-common" style="margin-top: 15px">
-          <div class="last-update">
-            Last Update <span class="last-update-value">12h</span>
-          </div>
-          <div class="follow-find-postimer">
-            <button class="follow-btn">Follow</button>
-          </div>
-        </div>
-      </div><div class="card-find-postimer">
-        <div class="image-container-find-postimer">
-          <img src="https://avatars.githubusercontent.com/u/20264401">
-        </div>
-        <div class="user-details-find-postimer verical-alingment-postimes-postimer-common">
-          <div class="name-find-postimer">
-            Abdullah Salim
-          </div>
-          <div class="username-find-postimer">
-            @abdullah
-          </div>
-        </div>
-        <div class="postime-postimers-find-postimer verical-alingment-postimes-postimer-common">
-          <div class="postime-find-postimer">
-            PosTime <span class="postime-postimers-values">20</span>
-          </div>
-          <div class="postimer-find-postimer">
-            PosTimer <span class="postime-postimers-values">20</span>
-          </div>
-        </div>
-        <div class="last-update-follow-find-postimer verical-alingment-postimes-postimer-common" style="margin-top: 15px">
-          <div class="last-update">
-            Last Update <span class="last-update-value">12h</span>
-          </div>
-          <div class="follow-find-postimer">
-            <button class="follow-btn">Follow</button>
+          <div
+            class="
+              last-update-follow-find-postimer
+              verical-alingment-postimes-postimer-common
+            "
+            style="margin-top: 15px"
+          >
+            <div v-if="objPosTimer.lastUpdate">
+              <div class="last-update">
+                Last Update
+                <span></span
+                ><span class="last-update-value">{{
+                  this.getElapsedTime(objPosTimer.lastUpdate)
+                }}</span>
+              </div>
+            </div>
+            <div class="follow-find-postimer">
+              <button
+                  class="follow-btn"
+                :aria-label="objPosTimer.username"
+                @click="this.addNewPosTimer(objPosTimer.username)"
+              >
+                Follow
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -91,9 +71,65 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "FindPosTimerHome"
-}
+  name: "FindPosTimerHome",
+  data() {
+    return {
+      objNewPosTimer: null,
+    };
+  },
+  created() {
+    this.getNewPosTimer();
+  },
+  methods: {
+    getNewPosTimer() {
+      axios
+        .get("http://127.0.0.1:3000/user/postime/find-postimer", {
+          withCredentials: true,
+        })
+        .then((res) => {
+          this.objNewPosTimer = res.data;
+        })
+        .catch((err) => console.log(err));
+    },
+    addNewPosTimer(username) {
+      // select element
+      const element = document.querySelector(`[aria-label="${username}"]`);
+      axios.post("http://127.0.0.1:3000/user/postime/new-postimer", {
+        username: username
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'
+        }
+      })
+          .then(res => {
+            if (res.data.check) {
+              element.innerHTML = "followed"
+            }
+          })
+          .catch(err => console.log(err))
+    },
+    getElapsedTime(t1) {
+      let seconds = Math.floor((Date.now() - Date.parse(t1)) / 1000);
+      if (seconds < 60) {
+        return seconds + " s";
+      }
+      let mins = Math.floor(seconds / 60);
+      if (mins < 60) {
+        return mins + " m";
+      }
+      let hours = Math.floor(mins / 60);
+      if (hours < 24) {
+        return hours + " h";
+      }
+      let days = Math.floor(hours / 24);
+      return days + " d";
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -106,7 +142,6 @@ export default {
 }
 .container-card-find-postimer > div {
   margin: 30px 0;
-
 }
 .card-find-postimer {
   background-color: #d9d9d9;
@@ -125,7 +160,7 @@ export default {
 .verical-alingment-postimes-postimer-common {
   margin: 10px 20px;
 }
-.verical-alingment-postimes-postimer-common > div:first-child{
+.verical-alingment-postimes-postimer-common > div:first-child {
   margin: 0 0 20px 0;
 }
 .follow-btn {
